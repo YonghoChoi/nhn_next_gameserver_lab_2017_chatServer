@@ -56,6 +56,9 @@ namespace NLogicLib
 			ConnectedUserList[sessionIndex].Clear();
 		}
 
+		// 모든 유저에 대한 상태를 한번에 체크하는 것이 아니라 부분부분 나눠서 체크
+		// 굳이 한번에 모든 유저를 검사할 필요는 없음. 부분으로 나누면 커보이는 것도 작게 관리할 수 있음.
+		// 하트비트도 이와 유사하게 검사하면 좋음.
 		void LoginCheck()
 		{
 			if (m_IsLoginCheck == false) {

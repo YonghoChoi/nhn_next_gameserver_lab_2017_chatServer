@@ -57,6 +57,8 @@ namespace NLogicLib
 	{
 		auto packetId = packetInfo.PacketId;
 		
+		// 실제 프로덕션에서 개발할 때는 packetId가 허용 범위인지 검사하는 코드가 있어야 함.
+		// 클라이언트 요청은 절대 믿으면 안되고 하나하나 검사하는 절차가 필요. 여기서는 생략.
 		if (PacketFuncArray[packetId] == nullptr)
 		{
 			//TODO: 로그 남긴다

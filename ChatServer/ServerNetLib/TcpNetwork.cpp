@@ -30,21 +30,28 @@ namespace NServerNetLib
 
 		m_pRefLogger = pLogger;
 
+		// 서버 소켓 생성
 		auto initRet = InitServerSocket();
 		if (initRet != NET_ERROR_CODE::NONE)
 		{
 			return initRet;
 		}
 		
+		// 서버 아이피와 포트 할당
 		auto bindListenRet = BindListen(pConfig->Port, pConfig->BackLogCount);
 		if (bindListenRet != NET_ERROR_CODE::NONE)
 		{
 			return bindListenRet;
 		}
 
-		FD_ZERO(&m_Readfds);
-		FD_SET(m_ServerSockfd, &m_Readfds);
+		// select 방식이기 때문에 접속자 수에 대한 관리를 FileDiscripter 사용.
+		FD_ZERO(&m_Readfds);	// 초기화
+		FD_SET(m_ServerSockfd, &m_Readfds); // 서버 소켓 정보를 m_Readfds에 셋팅
 		
+		// 성능을 위해 클라이언트 접속시 할당되는 session 객체를 풀로 관리
+		// 이 때 Max 클라이언트 수에 더해서 여유분인 Extra 클라이언트 수를 합산하여 풀을 생성
+		// 여유분까지 소진되기 시작하면 클라이언트에 혼잡여부를 알리던지 서버쪽에 알람을 발생시킴
+		// 여유분까지 넘어가면 이후 접속하는 클라이언트는 강제로 연결을 끊음
 		auto sessionPoolSize = CreateSessionPool(pConfig->MaxClientCount + pConfig->ExtraClientCount);
 			
 		m_pRefLogger->Write(LOG_TYPE::L_INFO, "%s | Session Pool Size: %d", __FUNCTION__, sessionPoolSize);
@@ -194,6 +201,9 @@ namespace NServerNetLib
 			session.pSendBuffer = new char[m_Config.MaxClientSendBufferSize];
 			
 			m_ClientSessionPool.push_back(session);
+
+			// 미사용중인 클라이언트 세션을 받아 올 때 루프를 돌지 않고 한번에 찾을 수 있도록 
+			// 큐로 세션 인덱스를 관리. 세션 풀에서 세션을 사용하면 해당 인덱스를 빼고 클라이언트가 연결을 해제하면 다시 큐에 인덱스를 삽입
 			m_ClientSessionPoolIndex.push_back(session.Index);			
 		}
 
@@ -282,9 +292,10 @@ namespace NServerNetLib
 			{
 				if (WSAGetLastError() == WSAEWOULDBLOCK)
 				{
-					return NET_ERROR_CODE::ACCEPT_API_WSAEWOULDBLOCK;
+					return NET_ERROR_CODE::ACCEPT_API_WSAEWOULDBLOCK;	// 에러 아님. 정상
 				}
 
+				// INVALID_SOCKET 이면서 WSAEWOLDBLOCK 상태가 아니라면 뭔가 문제가 발생한 것.
 				m_pRefLogger->Write(LOG_TYPE::L_ERROR, "%s | Wrong socket cannot accept", __FUNCTION__);
 				return NET_ERROR_CODE::ACCEPT_API_ERROR;
 			}

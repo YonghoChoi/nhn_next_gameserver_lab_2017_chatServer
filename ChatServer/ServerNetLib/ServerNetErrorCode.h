@@ -3,6 +3,7 @@
 namespace NServerNetLib
 {
 	// 에러 코드는 1 ~ 200까지 사용한다.
+	// 에러 코드는 바로 찾아 갈 수 있도록 유니크하게.
 	enum class NET_ERROR_CODE : short
 	{
 		NONE = 0,

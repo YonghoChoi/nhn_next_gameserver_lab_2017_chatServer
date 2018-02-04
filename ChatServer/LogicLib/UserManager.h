@@ -36,8 +36,9 @@ namespace NLogicLib
 				
 	private:
 		std::vector<User> m_UserObjPool;
-		std::deque<int> m_UserObjPoolIndex;
+		std::deque<int> m_UserObjPoolIndex;	// 루프 돌지 않고 인덱스로 미사용 유저를 검색할 수 있도록 미사용 인덱스 관리
 
+		// 편의용으로 인덱스나 아이디값으로 해당 유저를 검색할 수 있도록 컨테이너 사용
 		std::unordered_map<int, User*> m_UserSessionDic;
 		std::unordered_map<const char*, User*> m_UserIDDic; //char*는 key로 사용못함
 

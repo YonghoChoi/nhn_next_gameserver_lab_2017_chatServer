@@ -12,9 +12,9 @@ namespace NServerNetLib
 		int MaxClientCount;
 		int ExtraClientCount; // 가능하면 로그인에서 짜르도록 MaxClientCount + 여유분을 준비한다.
 		
-		short MaxClientSockOptRecvBufferSize;
+		short MaxClientSockOptRecvBufferSize;	// OS 커널의 버퍼 사이즈
 		short MaxClientSockOptSendBufferSize;
-		short MaxClientRecvBufferSize;
+		short MaxClientRecvBufferSize;	// 어플리케이션의 버퍼 사이즈
 		short MaxClientSendBufferSize;
 
 		bool IsLoginCheck;	// 연결 후 특정 시간 이내에 로그인 완료 여부 조사
@@ -28,7 +28,7 @@ namespace NServerNetLib
 	const int MAX_IP_LEN = 32; // IP 문자열 최대 길이
 	const int MAX_PACKET_BODY_SIZE = 1024; // 최대 패킷 보디 크기
 	
-	struct ClientSession
+	struct ClientSession	// 클라이언트 접속시 할당되는 객체
 	{
 		bool IsConnected() { return SocketFD != 0 ? true : false; }
 
@@ -70,7 +70,7 @@ namespace NServerNetLib
 		char* pRefData = 0;
 	};
 
-
+	// 클라이언트가 끊어진 이유를 알기 위해 필요.
 	enum class SOCKET_CLOSE_CASE : short
 	{
 		SESSION_POOL_EMPTY = 1,
@@ -89,6 +89,8 @@ namespace NServerNetLib
 				
 	};
 
+	// 4byte 단위로 구조체 크기가 정해지면 상관 없지만 5byte가 8byte로 갈 수 있기 때문에 1byte로 정렬
+	// 성능에 영향을 주기 때문에 안쓰는 것이 좋음.
 #pragma pack(push, 1)
 	struct PacketHeader
 	{

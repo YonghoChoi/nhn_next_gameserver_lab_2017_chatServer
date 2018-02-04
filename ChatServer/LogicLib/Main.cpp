@@ -43,6 +43,9 @@ namespace NLogicLib
 		m_pUserMgr = std::make_unique<UserManager>();
 		m_pUserMgr->Init(m_pServerConfig->MaxClientCount);
 
+		// Config 객체와 같은 경우에는 전역객체를 사용해도 되지만 취향 차이
+		// 전역 객체 사용을 별로 좋아하지 않아서 인자로 전달. 
+		// Unit 테스트나 객체 관리에 용이하지만 전달해야할 인자가 많다는 것이 단점.
 		m_pLobbyMgr = std::make_unique<LobbyManager>();
 		m_pLobbyMgr->Init({ m_pServerConfig->MaxLobbyCount, 
 							m_pServerConfig->MaxLobbyUserCount,
